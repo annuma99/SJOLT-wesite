@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SJOLT Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:wght@400;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════ LOGIN ═══════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">SJOLT</div>
+    <div class="login-sub">Admin Panel</div>
+    <div class="field" style="margin-bottom:0;">
+      <label>Password</label>
+      <input type="password" id="pwInput" placeholder="Enter admin password" />
+    </div>
+    <div id="loginError">Incorrect password. Try again.</div>
+    <br/>
+    <button onclick="login()">Sign In →</button>
+    <div class="login-note">
+      Default password: <code>sjolt2025</code><br>
+      Change it in Settings after signing in. Keep this file private — don't link to it from the public site.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ DASHBOARD ═══════════════════════ -->
+<div id="adminDash">
+
+  <div class="topbar">
+    <div class="topbar-logo">SJOLT <span>Admin Panel</span></div>
+    <div class="topbar-actions">
+      <button class="btn-save" onclick="saveAndToast()">💾 Save Progress</button>
+      <button class="btn-export" onclick="openExportModal()">⬇ Export index.js</button>
+      <button class="btn-logout" onclick="logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('articles', this)">📄 Articles</button>
+    <button class="tab" onclick="switchTab('masthead', this)">👥 Masthead</button>
+    <button class="tab" onclick="switchTab('guidelines', this)">📋 Guidelines</button>
+    <button class="tab" onclick="switchTab('settings', this)">⚙ Settings</button>
+  </div>
+
+  <div class="tab-content" id="tab-articles"></div>
+  <div class="tab-content" id="tab-masthead" style="display:none;"></div>
+  <div class="tab-content" id="tab-guidelines" style="display:none;"></div>
+  <div class="tab-content" id="tab-settings" style="display:none;"></div>
+
+</div>
+
+<!-- ═══════════════════ EXPORT MODAL ════════════════════════ -->
+<div id="exportModal">
+  <div class="modal-box">
+    <h3>Export Updated Site</h3>
+    <p>This will download a new <code>index.js</code> with all your current content baked in.</p>
+    <p><strong>After downloading, replace your old <code>index.js</code> with this new one.</strong></p>
+    <ol>
+      <li>Click <strong>Export</strong> below — a new <code>index.js</code> downloads</li>
+      <li>Replace the old <code>index.js</code> in your site folder</li>
+      <li>If on GitHub: commit the new file → Netlify redeploys automatically</li>
+      <li>If hosting manually: re-upload the file to your host</li>
+    </ol>
+    <div class="modal-actions">
+      <button class="btn-action btn-action-primary" onclick="exportSite()">⬇ Export Now</button>
+      <button class="modal-close" onclick="closeExportModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="admin.js"></script>
+</body>
+</html>

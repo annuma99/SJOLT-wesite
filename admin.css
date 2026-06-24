@@ -1,0 +1,377 @@
+:root {
+  --red:       #A32638;
+  --red-dark:  #7A1C2A;
+  --blue:      #1B3A6B;
+  --blue-mid:  #2E5FA3;
+  --white:     #FDFAF6;
+  --cream:     #F5EFE6;
+  --ink:       #1A1410;
+  --muted:     #6B5F55;
+  --border:    #DDD5C8;
+  --green:     #2E7D32;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Source Serif 4', serif; background: #F0EBE3; color: var(--ink); font-size: 15px; }
+
+/* ── LOGIN ─────────────────────────────────────────────── */
+#loginScreen {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--blue);
+}
+.login-box {
+  background: var(--white);
+  padding: 48px 40px;
+  width: 380px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.3);
+}
+.login-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem; font-weight: 900;
+  color: var(--blue); letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+.login-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--red);
+  margin-bottom: 32px;
+}
+.login-box label {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--blue);
+  margin-bottom: 6px;
+}
+.login-box input[type="password"] {
+  width: 100%; padding: 11px 14px;
+  border: 1.5px solid var(--border); font-size: 1rem;
+  font-family: 'Source Serif 4', serif;
+  outline: none; margin-bottom: 16px;
+}
+.login-box input[type="password"]:focus { border-color: var(--red); }
+.login-box button {
+  width: 100%; padding: 12px;
+  background: var(--red); color: var(--white);
+  border: none; cursor: pointer;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem; letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: background .2s;
+}
+.login-box button:hover { background: var(--red-dark); }
+.login-note {
+  margin-top: 24px;
+  font-size: 0.8rem; color: var(--muted);
+  border-top: 1px solid var(--border);
+  padding-top: 16px; line-height: 1.6;
+}
+.login-note code {
+  background: var(--cream); padding: 1px 6px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.85em;
+}
+#loginError {
+  display: none; color: var(--red);
+  font-size: 0.83rem; margin-top: 10px;
+}
+
+/* ── TOP BAR ──────────────────────────────────────────── */
+#adminDash { display: none; min-height: 100vh; }
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--blue);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px; height: 58px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+}
+.topbar-logo {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900; font-size: 1.15rem;
+  color: var(--white); letter-spacing: 0.04em;
+}
+.topbar-logo span {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: rgba(255,255,255,0.55);
+  margin-left: 10px;
+}
+.topbar-actions { display: flex; gap: 10px; align-items: center; }
+.topbar-actions button {
+  padding: 8px 18px; border: none; cursor: pointer;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem; letter-spacing: 0.08em;
+  text-transform: uppercase; transition: all .18s;
+}
+.btn-save { background: rgba(255,255,255,0.12); color: var(--white); }
+.btn-save:hover { background: rgba(255,255,255,0.22); }
+.btn-export { background: var(--red); color: var(--white); }
+.btn-export:hover { background: var(--red-dark); }
+.btn-logout { background: transparent; color: rgba(255,255,255,0.5); }
+.btn-logout:hover { color: var(--white); }
+
+/* ── TABS ─────────────────────────────────────────────── */
+.tabs {
+  background: var(--white);
+  border-bottom: 2px solid var(--border);
+  display: flex; padding: 0 32px; gap: 0;
+}
+.tab {
+  padding: 14px 24px; border: none;
+  background: none; cursor: pointer;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.74rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--muted);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px; transition: color .18s;
+}
+.tab:hover { color: var(--ink); }
+.tab.active { color: var(--blue); border-bottom-color: var(--red); }
+
+/* ── TAB CONTENT ─────────────────────────────────────── */
+.tab-content { padding: 32px; max-width: 860px; }
+
+/* ── SECTION HEADERS ─────────────────────────────────── */
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--red);
+  margin-bottom: 16px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem; color: var(--blue);
+  margin-bottom: 20px;
+}
+
+/* ── FIELDS ──────────────────────────────────────────── */
+.field { margin-bottom: 16px; }
+.field label {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--blue);
+  margin-bottom: 5px;
+}
+.field input, .field textarea, .field select {
+  width: 100%; padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  background: var(--white); font-size: 0.95rem;
+  font-family: 'Source Serif 4', serif; color: var(--ink);
+  outline: none; transition: border-color .18s;
+}
+.field input:focus, .field textarea:focus { border-color: var(--red); }
+.field textarea { resize: vertical; min-height: 90px; }
+.field-hint { font-size: 0.78rem; color: var(--muted); margin-top: 4px; font-style: italic; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* ── CARD EDITORS ────────────────────────────────────── */
+.card-editor {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-top: 3px solid var(--blue);
+  padding: 24px; margin-bottom: 16px;
+}
+.card-editor-header {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.95rem; font-weight: 700;
+  color: var(--blue); margin-bottom: 16px;
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 12px;
+}
+.card-editor-header span { flex: 1; }
+
+/* ── PDF DROP ZONE ───────────────────────────────────── */
+.pdf-drop-zone {
+  border: 2px dashed var(--border);
+  background: var(--cream);
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .18s, background .18s;
+  user-select: none;
+  margin-top: 4px;
+}
+.pdf-drop-zone:hover { border-color: var(--blue-mid); }
+.pdf-drop-zone.dz-over {
+  border-color: var(--blue) !important;
+  background: #D6E4F7 !important;
+}
+.pdf-drop-zone.dz-ready {
+  border-color: var(--green) !important;
+  border-style: solid !important;
+  background: #f1f8f1 !important;
+}
+.pdf-drop-icon { font-size: 1.5rem; margin-bottom: 6px; }
+.pdf-drop-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--muted);
+}
+.pdf-drop-filename {
+  margin-top: 8px;
+  font-size: 0.82rem; color: var(--green);
+  font-family: 'DM Mono', monospace;
+}
+.pdf-drop-path {
+  margin-top: 4px;
+  font-size: 0.78rem; color: var(--muted);
+  font-style: italic;
+}
+
+/* ── BUTTONS ─────────────────────────────────────────── */
+.btn-add {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 16px; background: var(--blue);
+  color: var(--white); border: none; cursor: pointer;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem; letter-spacing: 0.08em;
+  text-transform: uppercase; transition: background .18s;
+}
+.btn-add:hover { background: var(--blue-mid); }
+.btn-remove {
+  padding: 4px 10px; background: transparent;
+  color: var(--red); border: 1px solid var(--red);
+  cursor: pointer; font-family: 'DM Mono', monospace;
+  font-size: 0.68rem; letter-spacing: 0.06em;
+  text-transform: uppercase; flex-shrink: 0;
+  transition: all .18s; white-space: nowrap;
+}
+.btn-remove:hover { background: var(--red); color: var(--white); }
+.btn-action {
+  padding: 10px 20px; border: none; cursor: pointer;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.74rem; letter-spacing: 0.08em;
+  text-transform: uppercase; transition: all .18s;
+}
+.btn-action-primary { background: var(--red); color: var(--white); }
+.btn-action-primary:hover { background: var(--red-dark); }
+.btn-action-blue { background: var(--blue); color: var(--white); }
+.btn-action-blue:hover { background: var(--blue-mid); }
+
+/* ── GUIDELINE ROWS ──────────────────────────────────── */
+.guideline-row {
+  display: flex; gap: 10px; align-items: flex-start;
+  margin-bottom: 10px;
+}
+.guideline-row input {
+  flex: 1; padding: 9px 12px;
+  border: 1.5px solid var(--border);
+  font-family: 'Source Serif 4', serif;
+  font-size: 0.93rem; outline: none;
+}
+.guideline-row input:focus { border-color: var(--red); }
+
+/* ── MASTHEAD ROWS ───────────────────────────────────── */
+.person-row {
+  display: flex; gap: 10px; align-items: flex-start;
+  margin-bottom: 10px; background: var(--cream);
+  padding: 12px; border-left: 3px solid var(--border);
+}
+.person-row input {
+  flex: 1; padding: 8px 10px;
+  border: 1.5px solid var(--border);
+  font-family: 'Source Serif 4', serif;
+  font-size: 0.9rem; outline: none;
+}
+.person-row input:focus { border-color: var(--blue); }
+.person-row input.year-field { flex: 0 0 150px; }
+
+/* ── EIC CARD ────────────────────────────────────────── */
+.eic-card {
+  background: linear-gradient(135deg, var(--blue), #2E5FA3);
+  padding: 24px; margin-bottom: 24px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+.eic-card label {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: rgba(255,255,255,0.65);
+  margin-bottom: 5px;
+}
+.eic-card input {
+  width: 100%; padding: 9px 12px;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.1); color: var(--white);
+  font-family: 'Source Serif 4', serif; font-size: 0.95rem;
+  outline: none;
+}
+.eic-card input:focus { border-color: rgba(255,255,255,0.7); }
+.eic-card input::placeholder { color: rgba(255,255,255,0.4); }
+
+/* ── SETTINGS SECTIONS ───────────────────────────────── */
+.settings-block {
+  background: var(--white); border: 1.5px solid var(--border);
+  padding: 24px; margin-bottom: 20px;
+}
+.settings-block h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem; color: var(--blue); margin-bottom: 16px;
+}
+
+/* ── INFO BOX ────────────────────────────────────────── */
+.info-box {
+  background: var(--cream); border-left: 3px solid var(--blue);
+  padding: 14px 18px; margin-bottom: 24px;
+  font-size: 0.88rem; color: var(--muted); line-height: 1.6;
+}
+.info-box strong { color: var(--blue); }
+
+/* ── TOAST ───────────────────────────────────────────── */
+#toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--blue); color: var(--white);
+  padding: 12px 20px; font-family: 'DM Mono', monospace;
+  font-size: 0.8rem; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  opacity: 0; transform: translateY(8px);
+  transition: all .28s; pointer-events: none; z-index: 999;
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+#toast.success { background: var(--green); }
+#toast.error { background: var(--red); }
+
+/* ── EXPORT MODAL ────────────────────────────────────── */
+#exportModal {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5); z-index: 200;
+  align-items: center; justify-content: center;
+}
+#exportModal.open { display: flex; }
+.modal-box {
+  background: var(--white); padding: 36px;
+  max-width: 460px; width: 90%;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.3);
+}
+.modal-box h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem; color: var(--blue); margin-bottom: 12px;
+}
+.modal-box p { font-size: 0.88rem; color: var(--muted); line-height: 1.65; margin-bottom: 8px; }
+.modal-box ol {
+  font-size: 0.88rem; color: var(--ink);
+  line-height: 1.8; padding-left: 20px; margin: 12px 0 20px;
+}
+.modal-box code {
+  background: var(--cream); padding: 1px 6px;
+  font-family: 'DM Mono', monospace; font-size: 0.85em;
+}
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+.modal-close {
+  padding: 10px 20px; background: transparent;
+  border: 1.5px solid var(--border); cursor: pointer;
+  font-family: 'DM Mono', monospace; font-size: 0.74rem;
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+
+@media (max-width: 640px) {
+  .field-row { grid-template-columns: 1fr; }
+  .tab-content { padding: 20px 16px; }
+  .topbar { padding: 0 16px; }
+  .tabs { padding: 0 16px; overflow-x: auto; }
+  .eic-card { grid-template-columns: 1fr; }
+}
