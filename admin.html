@@ -379,6 +379,7 @@
   <div class="topbar">
     <div class="topbar-logo">SJOLT <span>Admin Panel</span></div>
     <div class="topbar-actions">
+      <button class="btn-save" onclick="reloadFromIndex()">↺ Reload from Site</button>
       <button class="btn-save" onclick="saveAndToast()">💾 Save Progress</button>
       <button class="btn-export" onclick="openExportModal()">⬇ Export index.html</button>
       <button class="btn-logout" onclick="logout()">Sign Out</button>
@@ -500,7 +501,7 @@ async function login() {
   if (valid) {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('adminDash').style.display = 'block';
-    loadState();
+    await loadStateFromIndex();
     renderAll();
   } else {
     document.getElementById('loginError').style.display = 'block';
@@ -508,7 +509,6 @@ async function login() {
 }
 
 function logout() {
-  saveState();
   document.getElementById('adminDash').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('pwInput').value = '';
@@ -516,21 +516,85 @@ function logout() {
 
 // ════════════════════════════════════════════════════════════
 //  STATE PERSISTENCE
+//
+//  Source of truth priority:
+//  1. index.html on the server  (always up to date after every export)
+//  2. localStorage              (fallback if index.html can't be fetched,
+//                                e.g. running fully offline)
 // ════════════════════════════════════════════════════════════
-function saveState() {
-  localStorage.setItem('sjolt_admin_state', JSON.stringify(S));
-}
 
-function loadState() {
-  const raw = localStorage.getItem('sjolt_admin_state');
-  if (raw) {
-    try { S = JSON.parse(raw); } catch(e) { S = JSON.parse(JSON.stringify(DEFAULTS)); }
+async function loadStateFromIndex() {
+  try {
+    const res = await fetch('index.html?nocache=' + Date.now());
+    if (!res.ok) throw new Error('fetch failed');
+    const html = await res.text();
+
+    // Extract the DATA block using the same markers as export
+    const startMarker = '\nconst DATA = ';
+    const endMarker   = '\n/* ══════════════════ END OF CONTENT DATA ══════════════════════ */';
+    const startIdx = html.indexOf(startMarker);
+    const endIdx   = html.indexOf(endMarker);
+
+    if (startIdx === -1 || endIdx === -1) throw new Error('markers not found');
+
+    // Grab just the object literal (everything between 'const DATA = ' and the end marker)
+    let dataStr = html.substring(startIdx + startMarker.length, endIdx).trim();
+    // Strip trailing semicolon if present
+    if (dataStr.endsWith(';')) dataStr = dataStr.slice(0, -1);
+
+    // Safely evaluate the JS object literal into a real object
+    // (DATA uses JS syntax like comments and trailing commas, so JSON.parse won't work)
+    const parsed = new Function('return (' + dataStr + ')')();
+
+    // Map the DATA shape → admin state shape S
+    S = {
+      latestVolume: {
+        number:      parsed.latestVolume?.number      ?? DEFAULTS.latestVolume.number,
+        year:        parsed.latestVolume?.year        ?? DEFAULTS.latestVolume.year,
+        description: parsed.latestVolume?.description ?? DEFAULTS.latestVolume.description,
+        articles:    parsed.latestVolume?.articles    ?? []
+      },
+      archive:   parsed.archive   ?? [],
+      masthead: {
+        editorInChief: parsed.masthead?.editorInChief ?? { name: '', year: '' },
+        editors:       parsed.masthead?.editors       ?? []
+      },
+      guidelines: parsed.guidelines ?? DEFAULTS.guidelines,
+      settings: {
+        registrationUrl: parsed.involved?.find(c => c.actionUrl)?.actionUrl ?? DEFAULTS.settings.registrationUrl,
+        contactEmail:    DEFAULTS.settings.contactEmail
+      }
+    };
+
+    // Persist to localStorage as a fallback cache
+    localStorage.setItem('sjolt_admin_state', JSON.stringify(S));
+    toast('Loaded content from index.html', 'success');
+
+  } catch (err) {
+    // Fallback: try localStorage, then DEFAULTS
+    console.warn('Could not read index.html, falling back to localStorage:', err);
+    const raw = localStorage.getItem('sjolt_admin_state');
+    if (raw) {
+      try {
+        S = JSON.parse(raw);
+        toast('Loaded from local cache (index.html unreachable)', '');
+        return;
+      } catch(e) {}
+    }
+    S = JSON.parse(JSON.stringify(DEFAULTS));
+    toast('Starting fresh — no saved data found', '');
   }
 }
 
+async function reloadFromIndex() {
+  if (!confirm('Reload all content from the live index.html? Any unsaved local changes will be overwritten.')) return;
+  await loadStateFromIndex();
+  renderAll();
+}
+
 function saveAndToast() {
-  saveState();
-  toast('Progress saved!', 'success');
+  localStorage.setItem('sjolt_admin_state', JSON.stringify(S));
+  toast('Progress saved locally!', 'success');
 }
 
 // ════════════════════════════════════════════════════════════
