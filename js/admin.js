@@ -699,9 +699,62 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3500);
 }
 
-function submitForm(type) {
-  document.getElementById('success-' + type).style.display = 'block';
-  showToast('✓ Form submitted successfully!');
+// ── Paste your Apps Script URL here ──────────────────────
+const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/stevens.edu/s/AKfycbziElN6e24rL70CG8vmC1-xTKZ8Axz9zHAcNStmupEkeGciOsIzN6wi_wuyEuV7p4E4Yg/exec';
+
+async function submitForm(type) {
+  let data = {};
+
+  if (type === 'interest') {
+    data = {
+      formType:    'interest',
+      name:        document.getElementById('if-name').value,
+      email:       document.getElementById('if-email').value,
+      topic:       document.getElementById('if-topic').value,
+      description: document.getElementById('if-desc').value
+    };
+  }
+
+  else if (type === 'submission') {
+    data = {
+      formType:    'submission',
+      firstName:   document.getElementById('sf-fname').value,
+      lastName:    document.getElementById('sf-lname').value,
+      email:       document.getElementById('sf-email').value,
+      institution: document.getElementById('sf-institution').value,
+      title:       document.getElementById('sf-title').value,
+      abstract:    document.getElementById('sf-abstract').value
+    };
+  }
+
+  else if (type === 'editor') {
+    data = {
+      formType:  'editor',
+      firstName: document.getElementById('ea-fname').value,
+      lastName:  document.getElementById('ea-lname').value,
+      email:     document.getElementById('ea-email').value,
+      year:      document.getElementById('ea-year').value,
+      major:     document.getElementById('ea-major').value,
+      role:      document.getElementById('ea-role').value,
+      why:       document.getElementById('ea-why').value
+    };
+  }
+
+  try {
+    // Note: mode 'no-cors' is required here — see explanation below
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode:   'no-cors',
+      body:   JSON.stringify(data)
+    });
+
+    document.getElementById('success-' + type).style.display = 'block';
+    showToast('✓ Submitted successfully!');
+
+  } catch (err) {
+    showToast('Something went wrong. Please try again.');
+    console.error(err);
+  }
 }
 
 /* ─── INIT ────────────────────────────────────────────────── */
