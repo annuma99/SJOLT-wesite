@@ -219,9 +219,58 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3500);
 }
 
-function submitForm(type) {
-  document.getElementById('success-' + type).style.display = 'block';
-  showToast('✓ Form submitted successfully!');
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw3F1oBxRvs9xpbjhHPEHgmnkAmg9joMYPHNSCs0LicmOsol1E_fHX0mXihcV6HpOK4rQ/exec';
+
+async function submitForm(type) {
+  // Gather fields depending on which form was submitted
+  let payload = { formType: type };
+
+  if (type === 'interest') {
+    payload = {
+      ...payload,
+      name:        document.getElementById('if-name').value,
+      email:       document.getElementById('if-email').value,
+      topic:       document.getElementById('if-topic').value,
+      description: document.getElementById('if-desc').value
+    };
+  } else if (type === 'submission') {
+    payload = {
+      ...payload,
+      firstName:   document.getElementById('sf-fname').value,
+      lastName:    document.getElementById('sf-lname').value,
+      email:       document.getElementById('sf-email').value,
+      institution: document.getElementById('sf-institution').value,
+      title:       document.getElementById('sf-title').value,
+      abstract:    document.getElementById('sf-abstract').value
+    };
+  } else if (type === 'editor') {
+    payload = {
+      ...payload,
+      firstName: document.getElementById('ea-fname').value,
+      lastName:  document.getElementById('ea-lname').value,
+      email:     document.getElementById('ea-email').value,
+      year:      document.getElementById('ea-year').value,
+      major:     document.getElementById('ea-major').value,
+      role:      document.getElementById('ea-role').value,
+      why:       document.getElementById('ea-why').value
+    };
+  }
+
+  try {
+    // Apps Script requires no-cors mode because of how Google's CORS headers work
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    // Show success (we can't read the response in no-cors, but if fetch didn't throw, it sent)
+    document.getElementById('success-' + type).style.display = 'block';
+    showToast('✓ Form submitted!');
+  } catch (err) {
+    showToast('Something went wrong. Please try again.');
+  }
 }
 
 /* ─── INIT ────────────────────────────────────────────────── */
