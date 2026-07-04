@@ -5,7 +5,351 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SJOLT Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:wght@400;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/admin.css" />
+  <style>
+    :root {
+      --red:       #A32638;
+      --red-dark:  #7A1C2A;
+      --blue:      #1B3A6B;
+      --blue-mid:  #2E5FA3;
+      --white:     #FDFAF6;
+      --cream:     #F5EFE6;
+      --ink:       #1A1410;
+      --muted:     #6B5F55;
+      --border:    #DDD5C8;
+      --green:     #2E7D32;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Source Serif 4', serif; background: #F0EBE3; color: var(--ink); font-size: 15px; }
+
+    /* ── LOGIN ─────────────────────────────────────────────── */
+    #loginScreen {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--blue);
+    }
+    .login-box {
+      background: var(--white);
+      padding: 48px 40px;
+      width: 380px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.3);
+    }
+    .login-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; font-weight: 900;
+      color: var(--blue); letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+    .login-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--red);
+      margin-bottom: 32px;
+    }
+    .login-box label {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--blue);
+      margin-bottom: 6px;
+    }
+    .login-box input[type="password"] {
+      width: 100%; padding: 11px 14px;
+      border: 1.5px solid var(--border); font-size: 1rem;
+      font-family: 'Source Serif 4', serif;
+      outline: none; margin-bottom: 16px;
+    }
+    .login-box input[type="password"]:focus { border-color: var(--red); }
+    .login-box button {
+      width: 100%; padding: 12px;
+      background: var(--red); color: var(--white);
+      border: none; cursor: pointer;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem; letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: background .2s;
+    }
+    .login-box button:hover { background: var(--red-dark); }
+    .login-note {
+      margin-top: 24px;
+      font-size: 0.8rem; color: var(--muted);
+      border-top: 1px solid var(--border);
+      padding-top: 16px; line-height: 1.6;
+    }
+    .login-note code {
+      background: var(--cream); padding: 1px 6px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85em;
+    }
+    #loginError {
+      display: none; color: var(--red);
+      font-size: 0.83rem; margin-top: 10px;
+    }
+
+    /* ── TOP BAR ──────────────────────────────────────────── */
+    #adminDash { display: none; min-height: 100vh; }
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: var(--blue);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; height: 58px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    }
+    .topbar-logo {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900; font-size: 1.15rem;
+      color: var(--white); letter-spacing: 0.04em;
+    }
+    .topbar-logo span {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: rgba(255,255,255,0.55);
+      margin-left: 10px;
+    }
+    .topbar-actions { display: flex; gap: 10px; align-items: center; }
+    .topbar-actions button {
+      padding: 8px 18px; border: none; cursor: pointer;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.08em;
+      text-transform: uppercase; transition: all .18s;
+    }
+    .btn-save { background: rgba(255,255,255,0.12); color: var(--white); }
+    .btn-save:hover { background: rgba(255,255,255,0.22); }
+    .btn-export {
+      background: var(--red); color: var(--white);
+    }
+    .btn-export:hover { background: var(--red-dark); }
+    .btn-logout { background: transparent; color: rgba(255,255,255,0.5); }
+    .btn-logout:hover { color: var(--white); }
+
+    /* ── TABS ─────────────────────────────────────────────── */
+    .tabs {
+      background: var(--white);
+      border-bottom: 2px solid var(--border);
+      display: flex; padding: 0 32px; gap: 0;
+    }
+    .tab {
+      padding: 14px 24px; border: none;
+      background: none; cursor: pointer;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.74rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted);
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px; transition: color .18s;
+    }
+    .tab:hover { color: var(--ink); }
+    .tab.active { color: var(--blue); border-bottom-color: var(--red); }
+
+    /* ── TAB CONTENT ─────────────────────────────────────── */
+    .tab-content { padding: 32px; max-width: 860px; }
+
+    /* ── SECTION HEADERS ─────────────────────────────────── */
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--red);
+      margin-bottom: 16px; padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem; color: var(--blue);
+      margin-bottom: 20px;
+    }
+
+    /* ── FIELDS ──────────────────────────────────────────── */
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--blue);
+      margin-bottom: 5px;
+    }
+    .field input, .field textarea, .field select {
+      width: 100%; padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      background: var(--white); font-size: 0.95rem;
+      font-family: 'Source Serif 4', serif; color: var(--ink);
+      outline: none; transition: border-color .18s;
+    }
+    .field input:focus, .field textarea:focus { border-color: var(--red); }
+    .field textarea { resize: vertical; min-height: 90px; }
+    .field-hint {
+      font-size: 0.78rem; color: var(--muted);
+      margin-top: 4px; font-style: italic;
+    }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    /* ── CARD EDITORS (articles, editors) ────────────────── */
+    .card-editor {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-top: 3px solid var(--blue);
+      padding: 24px; margin-bottom: 16px;
+    }
+    .card-editor-header {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem; font-weight: 700;
+      color: var(--blue); margin-bottom: 16px;
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 12px;
+    }
+    .card-editor-header span { flex: 1; }
+
+    /* ── BUTTONS ─────────────────────────────────────────── */
+    .btn-add {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 16px; background: var(--blue);
+      color: var(--white); border: none; cursor: pointer;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.08em;
+      text-transform: uppercase; transition: background .18s;
+    }
+    .btn-add:hover { background: var(--blue-mid); }
+    .btn-remove {
+      padding: 4px 10px; background: transparent;
+      color: var(--red); border: 1px solid var(--red);
+      cursor: pointer; font-family: 'DM Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.06em;
+      text-transform: uppercase; flex-shrink: 0;
+      transition: all .18s; white-space: nowrap;
+    }
+    .btn-remove:hover { background: var(--red); color: var(--white); }
+    .btn-action {
+      padding: 10px 20px; border: none; cursor: pointer;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.74rem; letter-spacing: 0.08em;
+      text-transform: uppercase; transition: all .18s;
+    }
+    .btn-action-primary { background: var(--red); color: var(--white); }
+    .btn-action-primary:hover { background: var(--red-dark); }
+    .btn-action-blue { background: var(--blue); color: var(--white); }
+    .btn-action-blue:hover { background: var(--blue-mid); }
+
+    /* ── GUIDELINE ROWS ──────────────────────────────────── */
+    .guideline-row {
+      display: flex; gap: 10px; align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    .guideline-row input {
+      flex: 1; padding: 9px 12px;
+      border: 1.5px solid var(--border);
+      font-family: 'Source Serif 4', serif;
+      font-size: 0.93rem; outline: none;
+    }
+    .guideline-row input:focus { border-color: var(--red); }
+
+    /* ── SIMPLE EDITOR ROWS (masthead people) ────────────── */
+    .person-row {
+      display: flex; gap: 10px; align-items: flex-start;
+      margin-bottom: 10px; background: var(--cream);
+      padding: 12px; border-left: 3px solid var(--border);
+    }
+    .person-row input {
+      flex: 1; padding: 8px 10px;
+      border: 1.5px solid var(--border);
+      font-family: 'Source Serif 4', serif;
+      font-size: 0.9rem; outline: none;
+    }
+    .person-row input:focus { border-color: var(--blue); }
+    .person-row input.year-field { flex: 0 0 150px; }
+
+    /* ── EIC CARD ────────────────────────────────────────── */
+    .eic-card {
+      background: linear-gradient(135deg, var(--blue), #2E5FA3);
+      padding: 24px; margin-bottom: 24px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    .eic-card label {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: rgba(255,255,255,0.65);
+      margin-bottom: 5px;
+    }
+    .eic-card input {
+      width: 100%; padding: 9px 12px;
+      border: 1.5px solid rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.1); color: var(--white);
+      font-family: 'Source Serif 4', serif; font-size: 0.95rem;
+      outline: none;
+    }
+    .eic-card input:focus { border-color: rgba(255,255,255,0.7); }
+    .eic-card input::placeholder { color: rgba(255,255,255,0.4); }
+
+    /* ── SETTINGS SECTIONS ───────────────────────────────── */
+    .settings-block {
+      background: var(--white); border: 1.5px solid var(--border);
+      padding: 24px; margin-bottom: 20px;
+    }
+    .settings-block h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem; color: var(--blue); margin-bottom: 16px;
+    }
+
+    /* ── INFO BOX ────────────────────────────────────────── */
+    .info-box {
+      background: var(--cream); border-left: 3px solid var(--blue);
+      padding: 14px 18px; margin-bottom: 24px;
+      font-size: 0.88rem; color: var(--muted); line-height: 1.6;
+    }
+    .info-box strong { color: var(--blue); }
+
+    /* ── TOAST ───────────────────────────────────────────── */
+    #toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--blue); color: var(--white);
+      padding: 12px 20px; font-family: 'DM Mono', monospace;
+      font-size: 0.8rem; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      opacity: 0; transform: translateY(8px);
+      transition: all .28s; pointer-events: none; z-index: 999;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    #toast.success { background: var(--green); }
+    #toast.error { background: var(--red); }
+
+    /* ── EXPORT MODAL ────────────────────────────────────── */
+    #exportModal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); z-index: 200;
+      align-items: center; justify-content: center;
+    }
+    #exportModal.open { display: flex; }
+    .modal-box {
+      background: var(--white); padding: 36px;
+      max-width: 460px; width: 90%;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.3);
+    }
+    .modal-box h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem; color: var(--blue); margin-bottom: 12px;
+    }
+    .modal-box p { font-size: 0.88rem; color: var(--muted); line-height: 1.65; margin-bottom: 8px; }
+    .modal-box ol {
+      font-size: 0.88rem; color: var(--ink);
+      line-height: 1.8; padding-left: 20px; margin: 12px 0 20px;
+    }
+    .modal-box code {
+      background: var(--cream); padding: 1px 6px;
+      font-family: 'DM Mono', monospace; font-size: 0.85em;
+    }
+    .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .modal-close {
+      padding: 10px 20px; background: transparent;
+      border: 1.5px solid var(--border); cursor: pointer;
+      font-family: 'DM Mono', monospace; font-size: 0.74rem;
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+
+    @media (max-width: 640px) {
+      .field-row { grid-template-columns: 1fr; }
+      .tab-content { padding: 20px 16px; }
+      .topbar { padding: 0 16px; }
+      .tabs { padding: 0 16px; overflow-x: auto; }
+      .eic-card { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
 
@@ -16,7 +360,8 @@
     <div class="login-sub">Admin Panel</div>
     <div class="field" style="margin-bottom:0;">
       <label>Password</label>
-      <input type="password" id="pwInput" placeholder="Enter admin password" />
+      <input type="password" id="pwInput" placeholder="Enter admin password"
+        onkeydown="if(event.key==='Enter') login()" />
     </div>
     <div id="loginError">Incorrect password. Try again.</div>
     <br/>
@@ -35,7 +380,7 @@
     <div class="topbar-logo">SJOLT <span>Admin Panel</span></div>
     <div class="topbar-actions">
       <button class="btn-save" onclick="saveAndToast()">💾 Save Progress</button>
-      <button class="btn-export" onclick="openExportModal()">⬇ Export index.js</button>
+      <button class="btn-export" onclick="openExportModal()">⬇ Export index.html</button>
       <button class="btn-logout" onclick="logout()">Sign Out</button>
     </div>
   </div>
@@ -47,9 +392,16 @@
     <button class="tab" onclick="switchTab('settings', this)">⚙ Settings</button>
   </div>
 
+  <!-- ARTICLES TAB -->
   <div class="tab-content" id="tab-articles"></div>
+
+  <!-- MASTHEAD TAB -->
   <div class="tab-content" id="tab-masthead" style="display:none;"></div>
+
+  <!-- GUIDELINES TAB -->
   <div class="tab-content" id="tab-guidelines" style="display:none;"></div>
+
+  <!-- SETTINGS TAB -->
   <div class="tab-content" id="tab-settings" style="display:none;"></div>
 
 </div>
@@ -58,14 +410,17 @@
 <div id="exportModal">
   <div class="modal-box">
     <h3>Export Updated Site</h3>
-    <p>This will download a new <code>index.js</code> with all your current content baked in.</p>
-    <p><strong>After downloading, replace your old <code>index.js</code> with this new one.</strong></p>
+    <p>This will download a new <code>index.html</code> with all your current content baked in.</p>
+    <p><strong>After downloading, replace your old <code>index.html</code> with this new one.</strong></p>
     <ol>
-      <li>Click <strong>Export</strong> below — a new <code>index.js</code> downloads</li>
-      <li>Replace the old <code>index.js</code> in your site folder</li>
+      <li>Click <strong>Export</strong> below — a new <code>index.html</code> downloads</li>
+      <li>Replace the old <code>index.html</code> in your site folder</li>
       <li>If on GitHub: commit the new file → Netlify redeploys automatically</li>
       <li>If hosting manually: re-upload the file to your host</li>
     </ol>
+    <p style="font-size:0.82rem; color:var(--red);">
+      ⚠ Make sure <code>admin.html</code> and <code>index.html</code> are in the same folder, and you're running on a server (not opening as a local file). If needed: <code>python -m http.server</code>
+    </p>
     <div class="modal-actions">
       <button class="btn-action btn-action-primary" onclick="exportSite()">⬇ Export Now</button>
       <button class="modal-close" onclick="closeExportModal()">Cancel</button>
@@ -75,6 +430,630 @@
 
 <div id="toast"></div>
 
-<script src="js/admin.js"></script>
+<script>
+// ════════════════════════════════════════════════════════════
+//  STATE — this mirrors the DATA object in index.html
+// ════════════════════════════════════════════════════════════
+const DEFAULTS = {
+  latestVolume: {
+    number: "Volume I",
+    year: "2024–2025",
+    description: "Our inaugural volume explores foundational questions at the intersection of law, policy, and emerging technology.",
+    articles: []
+  },
+  masthead: {
+    editorInChief: { name: "", year: "" },
+    editors: []
+  },
+  guidelines: [
+    "Manuscripts must be original, unpublished work not under review elsewhere",
+    "Submissions should be 8,000–15,000 words including footnotes; shorter Notes (4,000–8,000 words) are also accepted",
+    "All citations must comply with The Bluebook (21st edition)",
+    "Submissions must be anonymized — remove all identifying author information before upload",
+    "Accepted formats: Microsoft Word (.docx) or PDF",
+    "Authors will be notified of a decision within 8–10 weeks of submission"
+  ],
+  settings: {
+    registrationUrl: "https://stevens.edu",
+    contactEmail: "sjolt@stevens.edu"
+  }
+};
+
+// Deep clone
+let S = JSON.parse(JSON.stringify(DEFAULTS));
+
+// ════════════════════════════════════════════════════════════
+//  AUTH
+// ════════════════════════════════════════════════════════════
+// SHA-256 of 'sjolt2025'
+const FACTORY_HASH = 'f0c04c9a7e28bf7b2a7e14b9a1c4b2d8e5f6c7a3b9d0e1f2c3a4b5d6e7f8a9b0';
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+async function login() {
+  const pw = document.getElementById('pwInput').value.trim();
+  if (!pw) return;
+  const hash = await sha256(pw);
+  const stored = localStorage.getItem('sjolt_pw_hash');
+
+  // On first ever login: stored is null, compare against default
+  let valid = false;
+  if (stored) {
+    valid = (hash === stored);
+  } else {
+    // First time: accept 'sjolt2025' and save its hash
+    const defaultHash = await sha256('sjolt2025');
+    if (hash === defaultHash) {
+      localStorage.setItem('sjolt_pw_hash', defaultHash);
+      valid = true;
+    }
+  }
+
+  if (valid) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminDash').style.display = 'block';
+    loadState();
+    renderAll();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+
+function logout() {
+  saveState();
+  document.getElementById('adminDash').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('pwInput').value = '';
+}
+
+// ════════════════════════════════════════════════════════════
+//  STATE PERSISTENCE
+// ════════════════════════════════════════════════════════════
+function saveState() {
+  localStorage.setItem('sjolt_admin_state', JSON.stringify(S));
+}
+
+function loadState() {
+  const raw = localStorage.getItem('sjolt_admin_state');
+  if (raw) {
+    try { S = JSON.parse(raw); } catch(e) { S = JSON.parse(JSON.stringify(DEFAULTS)); }
+  }
+}
+
+function saveAndToast() {
+  saveState();
+  toast('Progress saved!', 'success');
+}
+
+// ════════════════════════════════════════════════════════════
+//  TAB SWITCHING
+// ════════════════════════════════════════════════════════════
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+  el.classList.add('active');
+  const content = document.getElementById('tab-' + name);
+  content.style.display = 'block';
+  // Re-render the active tab to reflect any pending state
+  if (name === 'articles')   renderArticles();
+  if (name === 'masthead')   renderMasthead();
+  if (name === 'guidelines') renderGuidelines();
+  if (name === 'settings')   renderSettings();
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDER — ARTICLES TAB
+// ════════════════════════════════════════════════════════════
+function renderArticles() {
+  const v = S.latestVolume;
+  let html = `
+    <div class="info-box">
+      <strong>How this works:</strong> Fill in the volume details and add each article below.
+      For the PDF path, put your PDF files in an <code>articles/</code> folder next to <code>index.html</code>,
+      then type the path like <code>articles/yourfile.pdf</code>. When done, hit <strong>Save Progress</strong>
+      then <strong>Export index.html</strong>.
+    </div>
+
+    <div class="section-label">Volume Info</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Volume Number</label>
+        <input id="vol-number" value="${esc(v.number)}" placeholder="e.g. Volume I" />
+      </div>
+      <div class="field">
+        <label>Academic Year</label>
+        <input id="vol-year" value="${esc(v.year)}" placeholder="e.g. 2024–2025" />
+      </div>
+    </div>
+    <div class="field">
+      <label>Volume Description (shows under the header)</label>
+      <textarea id="vol-desc" rows="2">${esc(v.description)}</textarea>
+    </div>
+
+    <div class="section-label" style="margin-top:32px;">
+      Articles
+      <button class="btn-add" onclick="addArticle()">+ Add Article</button>
+    </div>
+    <div id="articlesList">
+  `;
+
+  if (v.articles.length === 0) {
+    html += `<div style="color:var(--muted); font-style:italic; padding:16px 0;">
+      No articles yet. Click "+ Add Article" to get started.
+    </div>`;
+  }
+
+  v.articles.forEach((a, i) => {
+    html += `
+      <div class="card-editor" id="article-card-${i}">
+        <div class="card-editor-header">
+          <span>Article ${i + 1}${a.title ? ': ' + a.title : ''}</span>
+          <button class="btn-remove" onclick="removeArticle(${i})">✕ Remove</button>
+        </div>
+        <div class="field">
+          <label>Title</label>
+          <input value="${esc(a.title)}"
+            onchange="S.latestVolume.articles[${i}].title=this.value; refreshArticleHeader(${i}, this.value)" />
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Author Full Name</label>
+            <input value="${esc(a.author)}"
+              onchange="S.latestVolume.articles[${i}].author=this.value" />
+          </div>
+          <div class="field">
+            <label>Author Affiliation</label>
+            <input value="${esc(a.affiliation)}"
+              placeholder="Stevens Institute of Technology, '25"
+              onchange="S.latestVolume.articles[${i}].affiliation=this.value" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Abstract</label>
+          <textarea rows="4"
+            onchange="S.latestVolume.articles[${i}].abstract=this.value">${esc(a.abstract)}</textarea>
+        </div>
+        <div class="field">
+          <label>PDF File Path</label>
+          <input value="${esc(a.pdfUrl)}"
+            placeholder="articles/author-title.pdf"
+            onchange="S.latestVolume.articles[${i}].pdfUrl=this.value" />
+          <div class="field-hint">
+            Place the PDF in an <code>articles/</code> folder next to <code>index.html</code>.
+            Example: <code>articles/chen-ai-liability.pdf</code>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+  document.getElementById('tab-articles').innerHTML = html;
+}
+
+function addArticle() {
+  collectArticleFields(); // save current input values before re-render
+  S.latestVolume.articles.push({ title: '', author: '', affiliation: '', abstract: '', pdfUrl: '' });
+  renderArticles();
+  // Scroll to new card
+  setTimeout(() => {
+    const cards = document.querySelectorAll('.card-editor');
+    if (cards.length) cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 50);
+}
+
+function removeArticle(i) {
+  if (!confirm(`Remove Article ${i + 1}? This can't be undone until you reload.`)) return;
+  S.latestVolume.articles.splice(i, 1);
+  renderArticles();
+}
+
+function refreshArticleHeader(i, title) {
+  const header = document.querySelector(`#article-card-${i} .card-editor-header span`);
+  if (header) header.textContent = `Article ${i + 1}${title ? ': ' + title : ''}`;
+}
+
+// Collect current field values into state before re-renders
+function collectArticleFields() {
+  const v = document.getElementById('vol-number');
+  const y = document.getElementById('vol-year');
+  const d = document.getElementById('vol-desc');
+  if (v) S.latestVolume.number = v.value;
+  if (y) S.latestVolume.year = y.value;
+  if (d) S.latestVolume.description = d.value;
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDER — MASTHEAD TAB
+// ════════════════════════════════════════════════════════════
+function renderMasthead() {
+  const m = S.masthead;
+  let html = `
+    <div class="info-box">
+      <strong>Tip:</strong> Update this whenever editors join or leave, or at the start of each academic year.
+      The colored avatar circles on the public site generate automatically from each person's name.
+    </div>
+
+    <div class="section-label">Editor in Chief</div>
+    <div class="eic-card">
+      <div>
+        <label>Full Name</label>
+        <input id="eic-name" value="${esc(m.editorInChief.name)}"
+          placeholder="First Last"
+          onchange="S.masthead.editorInChief.name=this.value" />
+      </div>
+      <div>
+        <label>Class Year</label>
+        <input id="eic-year" value="${esc(m.editorInChief.year)}"
+          placeholder="Class of '25"
+          onchange="S.masthead.editorInChief.year=this.value" />
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:28px;">
+      Editors
+      <button class="btn-add" onclick="addEditor()">+ Add</button>
+    </div>
+    <div id="editorsList">
+  `;
+
+  if (m.editors.length === 0) {
+    html += `<div style="color:var(--muted); font-style:italic; padding:8px 0;">None added yet.</div>`;
+  }
+  m.editors.forEach((e, i) => {
+    html += personRow(i, e);
+  });
+
+  html += `</div>`;
+  document.getElementById('tab-masthead').innerHTML = html;
+}
+
+function personRow(i, e) {
+  return `
+    <div class="person-row">
+      <input value="${esc(e.name)}" placeholder="Full Name"
+        onchange="S.masthead.editors[${i}].name=this.value" />
+      <input class="year-field" value="${esc(e.year)}" placeholder="Class of '26"
+        onchange="S.masthead.editors[${i}].year=this.value" />
+      <button class="btn-remove" onclick="removeEditor(${i})">✕</button>
+    </div>
+  `;
+}
+
+function addEditor() {
+  S.masthead.editors.push({ name: '', year: '' });
+  renderMasthead();
+}
+
+function removeEditor(i) {
+  S.masthead.editors.splice(i, 1);
+  renderMasthead();
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDER — GUIDELINES TAB
+// ════════════════════════════════════════════════════════════
+function renderGuidelines() {
+  let html = `
+    <div class="info-box">
+      <strong>Submission Guidelines</strong> appear as a bulleted list on the Submissions page.
+      Edit any line, or add/remove as needed.
+    </div>
+    <div class="section-label">
+      Guidelines
+      <button class="btn-add" onclick="addGuideline()">+ Add Line</button>
+    </div>
+    <div id="guidelineRows">
+  `;
+
+  S.guidelines.forEach((g, i) => {
+    html += `
+      <div class="guideline-row">
+        <input value="${esc(g)}" placeholder="Guideline text..."
+          onchange="S.guidelines[${i}]=this.value" />
+        <button class="btn-remove" onclick="removeGuideline(${i})">✕</button>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+  document.getElementById('tab-guidelines').innerHTML = html;
+}
+
+function addGuideline() {
+  S.guidelines.push('');
+  renderGuidelines();
+  // Focus the new input
+  setTimeout(() => {
+    const rows = document.querySelectorAll('.guideline-row input');
+    if (rows.length) rows[rows.length - 1].focus();
+  }, 50);
+}
+
+function removeGuideline(i) {
+  S.guidelines.splice(i, 1);
+  renderGuidelines();
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDER — SETTINGS TAB
+// ════════════════════════════════════════════════════════════
+function renderSettings() {
+  const st = S.settings;
+  document.getElementById('tab-settings').innerHTML = `
+    <div class="settings-block">
+      <h3>Site Links</h3>
+      <div class="field">
+        <label>Stevens Registration URL</label>
+        <input id="set-regUrl" value="${esc(st.registrationUrl)}"
+          placeholder="https://stevens.edu/..."
+          onchange="S.settings.registrationUrl=this.value" />
+        <div class="field-hint">This is the link on the "Join as a Member" card and hero button.</div>
+      </div>
+      <div class="field">
+        <label>Contact Email</label>
+        <input id="set-email" value="${esc(st.contactEmail)}"
+          placeholder="sjolt@stevens.edu"
+          onchange="S.settings.contactEmail=this.value" />
+        <div class="field-hint">Shown in the site footer.</div>
+      </div>
+      <button class="btn-action btn-action-blue" onclick="saveAndToast()">Save</button>
+    </div>
+
+    <div class="settings-block">
+      <h3>Change Admin Password</h3>
+      <div class="field">
+        <label>New Password</label>
+        <input type="password" id="new-pw" placeholder="Enter new password" />
+      </div>
+      <div class="field">
+        <label>Confirm New Password</label>
+        <input type="password" id="confirm-pw" placeholder="Repeat new password" />
+      </div>
+      <button class="btn-action btn-action-primary" onclick="changePassword()">Update Password</button>
+      <div id="pw-msg" style="margin-top:10px; font-size:0.83rem;"></div>
+    </div>
+
+    <div class="settings-block">
+      <h3>Backup &amp; Restore</h3>
+      <p style="font-size:0.88rem; color:var(--muted); margin-bottom:16px;">
+        Download a backup of your admin data (useful when switching computers).
+        Restore by uploading a backup file.
+      </p>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <button class="btn-action btn-action-blue" onclick="backupData()">⬇ Download Backup</button>
+        <label class="btn-action btn-action-primary" style="cursor:pointer;">
+          ⬆ Restore from Backup
+          <input type="file" accept=".json" onchange="restoreData(this)" style="display:none;" />
+        </label>
+      </div>
+    </div>
+  `;
+}
+
+async function changePassword() {
+  const np = document.getElementById('new-pw').value;
+  const cp = document.getElementById('confirm-pw').value;
+  const msg = document.getElementById('pw-msg');
+  if (!np) { msg.textContent = 'Please enter a new password.'; msg.style.color = 'var(--red)'; return; }
+  if (np !== cp) { msg.textContent = 'Passwords do not match.'; msg.style.color = 'var(--red)'; return; }
+  if (np.length < 6) { msg.textContent = 'Password must be at least 6 characters.'; msg.style.color = 'var(--red)'; return; }
+  const hash = await sha256(np);
+  localStorage.setItem('sjolt_pw_hash', hash);
+  msg.textContent = '✓ Password updated successfully.';
+  msg.style.color = 'var(--green)';
+  document.getElementById('new-pw').value = '';
+  document.getElementById('confirm-pw').value = '';
+}
+
+function backupData() {
+  const blob = new Blob([JSON.stringify(S, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `sjolt-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  toast('Backup downloaded!', 'success');
+}
+
+function restoreData(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      S = parsed;
+      saveState();
+      renderAll();
+      toast('Data restored from backup!', 'success');
+    } catch(err) {
+      toast('Invalid backup file.', 'error');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDER ALL
+// ════════════════════════════════════════════════════════════
+function renderAll() {
+  renderArticles();
+  renderMasthead();
+  renderGuidelines();
+  renderSettings();
+}
+
+// ════════════════════════════════════════════════════════════
+//  EXPORT — generates and downloads a new index.html
+// ════════════════════════════════════════════════════════════
+function openExportModal() {
+  // Collect any unsaved field values first
+  collectAllFields();
+  document.getElementById('exportModal').classList.add('open');
+}
+
+function closeExportModal() {
+  document.getElementById('exportModal').classList.remove('open');
+}
+
+function collectAllFields() {
+  // Collect article tab fields
+  const vn = document.getElementById('vol-number');
+  const vy = document.getElementById('vol-year');
+  const vd = document.getElementById('vol-desc');
+  if (vn) S.latestVolume.number      = vn.value;
+  if (vy) S.latestVolume.year        = vy.value;
+  if (vd) S.latestVolume.description = vd.value;
+
+  // Collect settings fields
+  const ru = document.getElementById('set-regUrl');
+  const em = document.getElementById('set-email');
+  if (ru) S.settings.registrationUrl = ru.value;
+  if (em) S.settings.contactEmail    = em.value;
+}
+
+async function exportSite() {
+  collectAllFields();
+  saveState();
+  closeExportModal();
+
+  // Fetch the current index.html
+  let template;
+  try {
+    const res = await fetch('index.html');
+    if (!res.ok) throw new Error('not ok');
+    template = await res.text();
+  } catch(err) {
+    toast('Could not read index.html. See instructions above.', 'error');
+    return;
+  }
+
+  // Build the new DATA object that matches index.html's structure
+  const newData = buildDataObject();
+
+  // Find the DATA block in the template and replace it
+  const startMarker = '\nconst DATA = ';
+  const endMarker   = '\n/* ══════════════════ END OF CONTENT DATA ══════════════════════ */';
+
+  const startIdx = template.indexOf(startMarker);
+  const endIdx   = template.indexOf(endMarker);
+
+  if (startIdx === -1 || endIdx === -1) {
+    toast('Could not locate DATA block in index.html. Is this the right file?', 'error');
+    return;
+  }
+
+  // Find the semicolon right before the end marker
+  const before = template.substring(0, startIdx);
+  const after  = template.substring(endIdx); // includes the end marker and everything after
+
+  const newHtml = before
+    + '\nconst DATA = '
+    + JSON.stringify(newData, null, 2)
+    + ';\n'
+    + after;
+
+  // Download
+  const blob = new Blob([newHtml], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'index.html';
+  a.click();
+
+  toast('index.html exported! Replace the old file with this one.', 'success');
+}
+
+function buildDataObject() {
+  // Map admin state → the DATA shape that index.html expects
+  return {
+    mission: [
+      {
+        icon: "⚖️",
+        title: "Bridging Law & Technology",
+        text: "We publish rigorous scholarship that navigates the legal dimensions of emerging technologies — from AI and data privacy to cybersecurity and intellectual property."
+      },
+      {
+        icon: "🎓",
+        title: "Student-Driven Scholarship",
+        text: "Founded and operated by Stevens students, SJOLT provides a platform for the next generation of legal-tech thinkers to share original research."
+      },
+      {
+        icon: "🌐",
+        title: "Open Access",
+        text: "All SJOLT publications are freely available to the public. We believe that cutting-edge legal scholarship should be accessible to everyone."
+      }
+    ],
+    involved: [
+      {
+        icon: "📖",
+        title: "Read the Journal",
+        text: "Explore our published volumes — each article is freely available as a PDF download.",
+        actionLabel: "Browse Latest Volume",
+        actionPage: "volume"
+      },
+      {
+        icon: "🔗",
+        title: "Join as a Member",
+        text: "Register through Stevens to become a passive member of SJOLT and stay informed on new publications and events.",
+        actionLabel: "Register at Stevens →",
+        actionUrl: S.settings.registrationUrl
+      },
+      {
+        icon: "✉️",
+        title: "Get in Touch",
+        text: "Interested in submitting, collaborating, or learning more about our team? We'd love to hear from you.",
+        actionLabel: "Go to Submissions",
+        actionPage: "submissions"
+      }
+    ],
+    latestVolume: {
+      number:      S.latestVolume.number,
+      year:        S.latestVolume.year,
+      description: S.latestVolume.description,
+      articles:    S.latestVolume.articles
+    },
+    guidelines: S.guidelines,
+    masthead: {
+      editorInChief: {
+        name: S.masthead.editorInChief.name,
+        year: S.masthead.editorInChief.year,
+        bio:  "Editor in Chief"
+      },
+      editors: S.masthead.editors
+    }
+  };
+}
+
+// ════════════════════════════════════════════════════════════
+//  UTILITIES
+// ════════════════════════════════════════════════════════════
+function esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+let toastTimer;
+function toast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.className = '', 3500);
+}
+
+// Allow pressing Enter in login
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('pwInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') login();
+  });
+});
+</script>
 </body>
 </html>
