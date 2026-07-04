@@ -511,6 +511,96 @@
       font-weight: 700;
     }
 
+    /* ─── VOLUME CARDS (Journal page) ──────────────────────── */
+    .volume-list { display: grid; gap: 28px; max-width: 860px; }
+    .volume-card {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px; align-items: center;
+      background: var(--white);
+      border-left: 4px solid var(--red);
+      padding: 32px 28px;
+      box-shadow: var(--shadow);
+      transition: transform .22s, box-shadow .22s;
+    }
+    .volume-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+    .volume-card-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--red);
+      margin-bottom: 8px;
+    }
+    .volume-card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; font-weight: 700;
+      color: var(--blue); margin-bottom: 10px;
+    }
+    .volume-card-desc {
+      font-size: 0.93rem; color: var(--muted); line-height: 1.65;
+      margin-bottom: 16px;
+    }
+    .volume-card-count {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.74rem; letter-spacing: 0.08em;
+      color: var(--muted); margin-bottom: 16px;
+    }
+    .volume-card-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .volume-card-dl {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px; background: var(--blue);
+      color: var(--white); font-family: 'DM Mono', monospace;
+      font-size: 0.74rem; letter-spacing: 0.08em;
+      text-transform: uppercase; border: none;
+      cursor: pointer; transition: background .2s;
+      text-decoration: none !important;
+    }
+    .volume-card-dl:hover { background: var(--blue-mid); }
+    .volume-card-dl.outline {
+      background: transparent; color: var(--blue);
+      border: 1.5px solid var(--blue);
+    }
+    .volume-card-dl.outline:hover { background: var(--blue-light); }
+    .volume-badge {
+      background: linear-gradient(135deg, var(--blue), var(--blue-mid));
+      color: var(--white); width: 80px; height: 80px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      flex-shrink: 0; font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; font-weight: 900; line-height: 1;
+    }
+    .volume-badge span {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: rgba(255,255,255,0.65);
+      margin-top: 4px;
+    }
+
+    /* ─── ARTICLE FILTER (Articles page) ───────────────────── */
+    .article-filter {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      margin-bottom: 36px;
+    }
+    .filter-btn {
+      padding: 7px 16px; border: 1.5px solid var(--border, #DDD5C8);
+      background: transparent; color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.08em;
+      text-transform: uppercase; cursor: pointer;
+      transition: all .18s;
+    }
+    .filter-btn:hover { border-color: var(--blue); color: var(--blue); }
+    .filter-btn.active {
+      background: var(--blue); border-color: var(--blue);
+      color: var(--white);
+    }
+    .article-vol-badge {
+      display: inline-block;
+      padding: 2px 10px; background: var(--blue-light);
+      color: var(--blue); font-family: 'DM Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.08em;
+      text-transform: uppercase; margin-bottom: 8px;
+    }
+
     /* ─── GOOGLE FORM EMBED ─────────────────────────────────── */
     .gform-wrapper {
       margin-bottom: 40px;
@@ -673,10 +763,20 @@
     <div class="hero-rule"></div>
     <p class="hero-sub" id="volumeHeroSub"></p>
   </div>
+
+  <!-- Individual articles -->
   <div class="section">
     <div class="section-title">Articles</div>
     <div class="section-title-rule"></div>
     <div class="article-list" id="articleList"></div>
+  </div>
+
+  <!-- Archive -->
+  <div class="section section-alt" id="archiveSection">
+    <div class="section-title">Archive</div>
+    <div class="section-title-rule"></div>
+    <p class="section-sub">Download the complete journal PDF for each past volume.</p>
+    <div class="volume-list" id="archiveList"></div>
   </div>
 </div>
 
@@ -732,7 +832,7 @@
           The URL looks like: https://docs.google.com/forms/d/e/LONG_ID/viewform?embedded=true
         -->
         <iframe
-          src="https://docs.google.com/forms/d/e/1FAIpQLSfmohp-Vle_irBjs2fanZ1dxW-G5nm1iPS61raAke86wb2I9Q/viewform"
+          src="https://docs.google.com/forms/d/e/PASTE_YOUR_SUBMISSION_FORM_ID_HERE/viewform?embedded=true"
           height="900"
           loading="lazy"
           title="SJOLT Manuscript Submission Form">
@@ -740,7 +840,7 @@
         </iframe>
       </div>
       <div class="gform-fallback">
-        Form not loading? <a href="https://docs.google.com/forms/d/e/1FAIpQLSfmohp-Vle_irBjs2fanZ1dxW-G5nm1iPS61raAke86wb2I9Q/viewform" target="_blank">Open it directly →</a>
+        Form not loading? <a href="https://docs.google.com/forms/d/e/PASTE_YOUR_SUBMISSION_FORM_ID_HERE/viewform" target="_blank">Open it directly →</a>
       </div>
     </div>
   </div>
@@ -772,31 +872,45 @@
       </ul>
     </div>
 
-    <!-- Editor Application — Google Form embed -->
-    <div class="gform-wrapper">
-      <div class="gform-header">
-        <div class="gform-header-title">Editor Application</div>
-        <div class="gform-header-desc">Applications are reviewed on a rolling basis. We welcome applicants from all majors.</div>
+    <!-- Editor Application Form -->
+    <div class="form-wrapper">
+      <div class="form-title">Editor Application</div>
+      <div class="form-desc">Applications are reviewed on a rolling basis. We welcome applicants from all majors.</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" id="ea-fname" />
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" id="ea-lname" />
+        </div>
       </div>
-      <div class="gform-frame-outer">
-        <!--
-          HOW TO UPDATE THIS:
-          1. Open your Google Form → click Send → click the embed tab (<>)
-          2. Copy the src URL from the iframe code Google gives you
-          3. Paste it into the src attribute below, replacing the placeholder
-          The URL looks like: https://docs.google.com/forms/d/e/LONG_ID/viewform?embedded=true
-        -->
-        <iframe
-          src="https://docs.google.com/forms/d/e/1FAIpQLScQQxtcdEy4iZwF_RSD91JbO1QCkKWY4Da7KBTjeYRMM2sCig/viewform?usp=dialog"
-          height="1000"
-          loading="lazy"
-          title="SJOLT Editor Application Form">
-          Loading form…
-        </iframe>
+      <div class="form-group">
+        <label>Stevens Email</label>
+        <input type="email" placeholder="jsmith@stevens.edu" id="ea-email" />
       </div>
-      <div class="gform-fallback">
-        Form not loading? <a href="https://docs.google.com/forms/d/e/1FAIpQLScQQxtcdEy4iZwF_RSD91JbO1QCkKWY4Da7KBTjeYRMM2sCig/viewform?usp=dialog" target="_blank">Open it directly →</a>
+      <div class="form-group">
+        <label>Year</label>
+        <select id="ea-year">
+          <option value="">Select year…</option>
+          <option>First Year</option>
+          <option>Sophomore</option>
+          <option>Junior</option>
+          <option>Senior</option>
+          <option>Graduate Student</option>
+        </select>
       </div>
+      <div class="form-group">
+        <label>Major / Program</label>
+        <input type="text" id="ea-major" />
+      </div>
+      <div class="form-group">
+        <label>Why do you want to join SJOLT? (200–400 words)</label>
+        <textarea style="min-height:160px;" id="ea-why"></textarea>
+      </div>
+      <button class="form-submit" onclick="submitForm('editor')">Submit Application</button>
+      <div class="form-success" id="success-editor">✓ Application received! We'll follow up within two weeks.</div>
     </div>
   </div>
 </div>
@@ -833,120 +947,148 @@
    ╚══════════════════════════════════════════════════════════╝ */
 
 const DATA = {
-
-  /* ── MISSION CARDS (Home page) ───────────────────────────── */
-  mission: [
+  "mission": [
     {
-      icon: "⚖️",
-      title: "Bridging Law & Technology",
-      text: "We publish rigorous scholarship that navigates the legal dimensions of emerging technologies — from AI and data privacy to cybersecurity and intellectual property."
+      "icon": "⚖️",
+      "title": "Bridging Law & Technology",
+      "text": "We publish rigorous scholarship that navigates the legal dimensions of emerging technologies — from AI and data privacy to cybersecurity and intellectual property."
     },
     {
-      icon: "🎓",
-      title: "Student-Driven Scholarship",
-      text: "Founded and operated by Stevens students, SJOLT provides a platform for the next generation of legal-tech thinkers to share original research."
+      "icon": "🎓",
+      "title": "Student-Driven Scholarship",
+      "text": "Founded and operated by Stevens students, SJOLT provides a platform for the next generation of legal-tech thinkers to share original research."
     },
     {
-      icon: "🌐",
-      title: "Open Access",
-      text: "All SJOLT publications are freely available to the public. We believe that cutting-edge legal scholarship should be accessible to everyone."
+      "icon": "🌐",
+      "title": "Open Access",
+      "text": "All SJOLT publications are freely available to the public. We believe that cutting-edge legal scholarship should be accessible to everyone."
     }
   ],
-
-  /* ── GET INVOLVED CARDS (Home page) ─────────────────────── */
-  involved: [
+  "involved": [
     {
-      icon: "📖",
-      title: "Read the Journal",
-      text: "Explore our published volumes — each article is freely available as a PDF download.",
-      actionLabel: "Browse Latest Volume",
-      actionPage: "volume"
+      "icon": "📖",
+      "title": "Read the Journal",
+      "text": "Explore our published volumes — each article is freely available as a PDF download.",
+      "actionLabel": "Browse Latest Volume",
+      "actionPage": "volume"
     },
     {
-      icon: "🔗",
-      title: "Join as a Member",
-      text: "Register through Stevens to become a passive member of SJOLT and stay informed on new publications and events.",
-      actionLabel: "Register at Stevens →",
-      actionUrl: "https://stevens.edu"
+      "icon": "🔗",
+      "title": "Join as a Member",
+      "text": "Register through Stevens to become a passive member of SJOLT and stay informed on new publications and events.",
+      "actionLabel": "Register at Stevens →",
+      "actionUrl": "https://stevens.edu"
     },
     {
-      icon: "✉️",
-      title: "Get in Touch",
-      text: "Interested in submitting, collaborating, or learning more about our team? We'd love to hear from you.",
-      actionLabel: "Go to Submissions",
-      actionPage: "submissions"
+      "icon": "✉️",
+      "title": "Get in Touch",
+      "text": "Interested in submitting, collaborating, or learning more about our team? We'd love to hear from you.",
+      "actionLabel": "Go to Submissions",
+      "actionPage": "submissions"
     }
   ],
-
-  /* ── LATEST VOLUME ───────────────────────────────────────── */
-  latestVolume: {
-    number: "Volume I",
-    year: "2024–2025",
-    description: "Our inaugural volume explores foundational questions at the intersection of law, policy, and emerging technology.",
-    articles: [
+  "latestVolume": {
+    "number": "Volume I",
+    "year": "2024–2025",
+    "description": "Our inaugural volume explores foundational questions at the intersection of law, policy, and emerging technology.",
+    "articles": [
       {
-        title: "Algorithmic Accountability: Liability Frameworks for AI Decision-Making",
-        author: "Alexandra Chen",
-        affiliation: "Stevens Institute of Technology, '25",
-        abstract: "As artificial intelligence systems make increasingly consequential decisions in healthcare, finance, and criminal justice, existing tort law frameworks struggle to assign liability. This Article proposes a tiered accountability model that distinguishes between AI developers, deployers, and users, drawing on product liability doctrine and negligence standards to allocate responsibility in proportion to control and foreseeability.",
-        pdfUrl: "#"  /* Replace with actual PDF URL or relative path */
+        "title": "Digital Diagnostics and the Dilemma of Consent: Rethinking Patient Autonomy with AI-Powered Medicine",
+        "author": "Rimmo Loyi Lego",
+        "affiliation": "Stevens Institute of Technology '22",
+        "abstract": "This paper critically assesses the threat AI-powered diagnostics presents to US\nhealthcare's traditional informed consent dogma. Derived from traditional cases like\nCanterbury v. Spence (1972) and Schloendorff (1914), the research reveals how opaque,\nalgorithmic decision-making undermines patient autonomy and raises legal liability.\nWeaving together doctrinal and philosophical analysis, the paper contends the necessity\nof normative reforms—such as legislating algorithmic explainability into law and\nregulation—to modernize statutory and regulatory codes. Comparative EU lessons in\ndata protection and medical device regulation highlight the need for proactive U.S.\nlegislative changes. The work invites additional empirical studies on patient outcomes\nand satisfaction in AI-supported diagnostic procedures to guarantee ethical and\neffective clinical practice.",
+        "pdfUrl": "articles/lego_digital_diagnostics.pdf"
       },
       {
-        title: "Regulating the Metaverse: Jurisdictional Challenges in Virtual Worlds",
-        author: "Marcus Williams",
-        affiliation: "Stevens Institute of Technology, '25",
-        abstract: "Virtual environments present novel jurisdictional challenges that outpace existing regulatory frameworks. This Note examines how traditional notions of territorial sovereignty apply — or fail to apply — within persistent online worlds, and argues for a co-regulatory approach involving platform operators, users, and government stakeholders.",
-        pdfUrl: "#"
+        "title": "On the Protection of Workers’ Rights in the Digitized Workplace",
+        "author": "Kai de la Cruz",
+        "affiliation": "",
+        "abstract": "This paper examines how emergent forms of digital surveillance and algorithmic\nmanagement are reshaping labor relations and undermining core protections under the\nNational Labor Relations Act (NLRA). While often framed as neutral tools of efficiency,\ncybernated management systems are increasingly used to suppress union activity,\nobscure decision-making processes, and entrench managerial power. Drawing on legal\nscholarship, case law, and recent memoranda from the National Labor Relations Board\n(NLRB), including the now-rescinded GC 23-02, the paper outlines the risks posed by\nartificial intelligence, pre-employment screening tools, and continuous workplace\nmonitoring. It traces the historical lineage of scientific management and surveillance\nback to earlier forms of labor discipline, such as racialized coercion and Pinkerton union-\nbusting, arguing that contemporary tools reproduce similar hierarchies with greater\nopacity. The analysis highlights how current NLRB standards—developed in a pre-digital\nera—fail to adequately address the psychological, legal, and structural implications of\n21st-century surveillance practices. Special attention is paid to how the political\ncomposition of the NLRB shapes the enforcement of labor law, with the rescission of\ndozens of pro-worker memos under the second Trump administration illustrating the\nfragility of regulatory protections. Ultimately, the paper calls for a more aggressive and\nstrategic response by unions, legal advocates, and the Board itself to confront the\ninchoate crisis of digital labor control. Without such intervention, algorithmic\nmanagement will continue to erode worker autonomy, collective action, and the\npossibility of democratic oversight in the workplace.",
+        "pdfUrl": "articles/cruz_workers_rights.pdf"
       },
       {
-        title: "Data Dignity and the Right to Be Forgotten in the Age of Large Language Models",
-        author: "Sofia Patel",
-        affiliation: "Stevens Institute of Technology, '26",
-        abstract: "The European Union's General Data Protection Regulation enshrines a 'right to erasure,' but the technical architecture of large language models makes true data deletion nearly impossible. This Article analyzes the tension between data dignity rights and the technical constraints of generative AI, proposing regulatory safe harbors and model audit requirements as reconciliatory mechanisms.",
-        pdfUrl: "#"
-      },
-      {
-        title: "Cybersecurity as Critical Infrastructure: Federalizing Breach Disclosure",
-        author: "Jordan Lee",
-        affiliation: "Stevens Institute of Technology, '25",
-        abstract: "The patchwork of state-level breach notification laws has created compliance burdens for multi-state businesses while leaving consumers inconsistently protected. This Note argues for a federal minimum breach disclosure standard preempting state regimes, modeled on the SEC's cybersecurity disclosure rules and informed by comparative analysis of EU and UK approaches.",
-        pdfUrl: "#"
+        "title": "The Causal Ligament: Corporate and Agency Law and the Autonomous Weapons Accountability Gap",
+        "author": "Lauren E. Garrett",
+        "affiliation": "Stevens Institute of Technology '26",
+        "abstract": "When an autonomous weapons system misclassifies civilians as combatants and\ndestroys them, the frameworks most commonly invoked return a verdict that is, beneath\ntheir institutional veneer, a verdict of silence: command responsibility requires proof of\ncommand knowledge that autonomous targeting dissolves by design, and the policy\naspiration of meaningful human control, however prolifically circulated, prescribes no\noperational threshold and furnishes no forum with anything a plaintiff can take to court.\nThis Article proposes that corporate and agency law, brought to bear alongside IHL\nrather than in its place, supplies accountability mechanisms the humanitarian\nframework cannot produce unaided. The principal-agent relationship applies to\nautonomous weapons deployment with documentary precision; respondeat superior\nfastens liability without the intent requirements autonomous targeting renders\npermanently unavailable; and the retained control and inherently dangerous activity\nexceptions reach manufacturers and developers under existing domestic law, each\nsubject to the qualification that courts have historically resisted applying these\ndoctrines to battlefield sovereign conduct and that the argument for extending them\nmust be earned rather than assumed. Against deploying states, both IHL and corporate\ntort law encounter the same sovereign immunity wall, and this Article identifies a treaty\npathway whose structural design questions existing international instruments have\nalready answered, a pathway made politically conceivable by the commercial pressure\nthat transformed asbestos, tobacco, and pharmaceutical litigation into regulatory\nreform, though its realization remains contingent on political will this Article cannot\nsupply.",
+        "pdfUrl": "articles/garrett_causal_ligament.pdf"
       }
     ]
   },
-
-  /* ── SUBMISSION GUIDELINES ───────────────────────────────── */
-  guidelines: [
+  "archive": [
+    {
+      "number": "Volume I",
+      "year": "2024-2025",
+      "fullPdfUrl": "volumes/volume_1.pdf"
+    }
+  ],
+  "guidelines": [
     "Manuscripts must be original, unpublished work not under review elsewhere",
     "Submissions should be 8,000–15,000 words including footnotes; shorter Notes (4,000–8,000 words) are also accepted",
     "All citations must comply with The Bluebook (21st edition)",
     "Submissions must be anonymized — remove all identifying author information before upload",
     "Accepted formats: Microsoft Word (.docx) or PDF",
-    "Authors will be notified of a decision within 8–10 weeks of submission",
-    "Accepted pieces will undergo substantive editing in collaboration with our editorial board",
-    "SJOLT accepts work from students, recent graduates, and faculty at any institution"
+    "Authors will be notified of a decision within 8–10 weeks of submission"
   ],
-
-  /* ── MASTHEAD ────────────────────────────────────────────── */
-  masthead: {
-    editorInChief: {
-      name: "First Last",
-      year: "Class of '25",
-      bio: "Editor in Chief"
+  "masthead": {
+    "editorInChief": {
+      "name": "Nicholas Russo",
+      "year": "Class of '27",
+      "bio": "Editor in Chief"
     },
-    editors: [
-      { name: "First Last", year: "Class of '26" },
-      { name: "First Last", year: "Class of '26" },
-      { name: "First Last", year: "Class of '27" },
-      { name: "First Last", year: "Class of '25" },
-      { name: "First Last", year: "Class of '26" },
-      { name: "First Last", year: "Class of '26" },
-      { name: "First Last", year: "Class of '27" },
-      { name: "First Last", year: "Class of '27" }
+    "editors": [
+      {
+        "name": "Alessia Giuffrida",
+        "year": "Class of '29"
+      },
+      {
+        "name": "Amani Karim",
+        "year": "Class of '28"
+      },
+      {
+        "name": "Ananya Iyer",
+        "year": "Class of '27"
+      },
+      {
+        "name": "Charlotte Hubert",
+        "year": "Class of '29"
+      },
+      {
+        "name": "Jebin Thing",
+        "year": "Class of '28"
+      },
+      {
+        "name": "Jong In Park",
+        "year": "Class of '29"
+      },
+      {
+        "name": "Vritika Mandapaka",
+        "year": "Class of '26"
+      },
+      {
+        "name": "Lieu Butler",
+        "year": "Class of '29"
+      },
+      {
+        "name": "Sahana Ali",
+        "year": "Class of '27"
+      },
+      {
+        "name": "Victoria Martinez",
+        "year": "Class of '29"
+      },
+      {
+        "name": "Kimberly Hernandez",
+        "year": "Class of '29"
+      },
+      {
+        "name": "Viyasha Thakar",
+        "year": ""
+      }
     ]
   }
-
 };
+
 /* ══════════════════ END OF CONTENT DATA ══════════════════════ */
 
 
@@ -1003,6 +1145,36 @@ function renderVolume() {
         <span class="article-download-icon">⬇</span>
         PDF
       </a>
+    </div>
+  `).join('');
+}
+
+function renderArchive() {
+  const archive = DATA.archive;
+  const section = document.getElementById('archiveSection');
+
+  // Hide the whole section if there are no past volumes yet
+  if (!archive || archive.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = 'block';
+
+  document.getElementById('archiveList').innerHTML = archive.map(v => `
+    <div class="volume-card">
+      <div>
+        <div class="volume-card-eyebrow">${v.year}</div>
+        <div class="volume-card-title">${v.number}</div>
+        <div class="volume-card-actions">
+          <a class="volume-card-dl" href="${v.fullPdfUrl}" download>
+            ⬇ Download Full Volume
+          </a>
+        </div>
+      </div>
+      <div class="volume-badge">
+        ${v.number.replace('Volume ', '')}
+        <span>Vol</span>
+      </div>
     </div>
   `).join('');
 }
@@ -1089,8 +1261,123 @@ function submitForm(type) {
 renderMission();
 renderInvolved();
 renderVolume();
+renderArchive();
 renderGuidelines();
 renderMasthead();
+</script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
 </script>
 </body>
 </html>

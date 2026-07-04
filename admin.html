@@ -387,6 +387,7 @@
 
   <div class="tabs">
     <button class="tab active" onclick="switchTab('articles', this)">📄 Articles</button>
+    <button class="tab" onclick="switchTab('archive', this)">📦 Archive</button>
     <button class="tab" onclick="switchTab('masthead', this)">👥 Masthead</button>
     <button class="tab" onclick="switchTab('guidelines', this)">📋 Guidelines</button>
     <button class="tab" onclick="switchTab('settings', this)">⚙ Settings</button>
@@ -394,6 +395,9 @@
 
   <!-- ARTICLES TAB -->
   <div class="tab-content" id="tab-articles"></div>
+
+  <!-- ARCHIVE TAB -->
+  <div class="tab-content" id="tab-archive" style="display:none;"></div>
 
   <!-- MASTHEAD TAB -->
   <div class="tab-content" id="tab-masthead" style="display:none;"></div>
@@ -441,6 +445,7 @@ const DEFAULTS = {
     description: "Our inaugural volume explores foundational questions at the intersection of law, policy, and emerging technology.",
     articles: []
   },
+  archive: [],
   masthead: {
     editorInChief: { name: "", year: "" },
     editors: []
@@ -539,6 +544,7 @@ function switchTab(name, el) {
   content.style.display = 'block';
   // Re-render the active tab to reflect any pending state
   if (name === 'articles')   renderArticles();
+  if (name === 'archive')    renderArchiveTab();
   if (name === 'masthead')   renderMasthead();
   if (name === 'guidelines') renderGuidelines();
   if (name === 'settings')   renderSettings();
@@ -664,6 +670,80 @@ function collectArticleFields() {
   if (v) S.latestVolume.number = v.value;
   if (y) S.latestVolume.year = y.value;
   if (d) S.latestVolume.description = d.value;
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDER — ARCHIVE TAB
+// ════════════════════════════════════════════════════════════
+function renderArchiveTab() {
+  const arc = S.archive || [];
+  let html = `
+    <div class="info-box">
+      <strong>Archive:</strong> Add one entry per completed volume. Each entry gets a
+      "Download Full Volume" button on the public site. Put your full volume PDFs in a
+      <code>volumes/</code> folder next to <code>index.html</code> and set the path like
+      <code>volumes/sjolt-vol-1.pdf</code>. The archive section is automatically hidden
+      on the public site until you add at least one entry here.
+    </div>
+    <div class="section-label">
+      Past Volumes
+      <button class="btn-add" onclick="addArchiveEntry()">+ Add Volume</button>
+    </div>
+    <div id="archiveEntries">
+  `;
+
+  if (arc.length === 0) {
+    html += `<div style="color:var(--muted); font-style:italic; padding:16px 0;">
+      No past volumes yet. When a volume is complete, add it here with its full PDF.
+    </div>`;
+  }
+
+  arc.forEach((v, i) => {
+    html += `
+      <div class="card-editor">
+        <div class="card-editor-header">
+          <span>${v.number || 'New Volume'} ${v.year ? '· ' + v.year : ''}</span>
+          <button class="btn-remove" onclick="removeArchiveEntry(${i})">✕ Remove</button>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Volume Number</label>
+            <input value="${esc(v.number)}" placeholder="e.g. Volume I"
+              onchange="S.archive[${i}].number=this.value" />
+          </div>
+          <div class="field">
+            <label>Academic Year</label>
+            <input value="${esc(v.year)}" placeholder="e.g. 2024–2025"
+              onchange="S.archive[${i}].year=this.value" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Full Volume PDF Path</label>
+          <input value="${esc(v.fullPdfUrl)}" placeholder="volumes/sjolt-vol-1.pdf"
+            onchange="S.archive[${i}].fullPdfUrl=this.value" />
+          <div class="field-hint">
+            Place the complete journal PDF in a <code>volumes/</code> folder.
+            Example: <code>volumes/sjolt-volume-1.pdf</code>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+  document.getElementById('tab-archive').innerHTML = html;
+}
+
+function addArchiveEntry() {
+  if (!S.archive) S.archive = [];
+  S.archive.push({ number: '', year: '', fullPdfUrl: '' });
+  renderArchiveTab();
+}
+
+function removeArchiveEntry(i) {
+  if (!confirm('Remove this archive entry?')) return;
+  S.archive.splice(i, 1);
+  renderArchiveTab();
 }
 
 // ════════════════════════════════════════════════════════════
@@ -881,6 +961,7 @@ function restoreData(input) {
 // ════════════════════════════════════════════════════════════
 function renderAll() {
   renderArticles();
+  renderArchiveTab();
   renderMasthead();
   renderGuidelines();
   renderSettings();
@@ -1015,6 +1096,7 @@ function buildDataObject() {
       description: S.latestVolume.description,
       articles:    S.latestVolume.articles
     },
+    archive: S.archive || [],
     guidelines: S.guidelines,
     masthead: {
       editorInChief: {
