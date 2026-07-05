@@ -1062,7 +1062,8 @@ function collectAllFields() {
 
 async function exportSite() {
   collectAllFields();
-  saveState();
+  // Save current state to localStorage as a cache
+  localStorage.setItem('sjolt_admin_state', JSON.stringify(S));
   closeExportModal();
 
   // Fetch the current index.html
