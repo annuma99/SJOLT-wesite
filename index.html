@@ -701,6 +701,7 @@
   <ul class="nav-links" id="navLinks">
     <li><a href="#" class="active" data-page="home">Home</a></li>
     <li><a href="#" data-page="volume">Latest Volume</a></li>
+    <li><a href="#" data-page="archive">Archive</a></li>
     <li><a href="#" data-page="submissions">Submissions</a></li>
     <li><a href="#" data-page="editors">Join as Editor</a></li>
     <li><a href="#" data-page="masthead">Masthead</a></li>
@@ -722,7 +723,7 @@
       A student-run publication at Stevens Institute of Technology dedicated to the intersection of emerging technology and the law.
     </p>
     <div class="hero-buttons">
-      <button class="btn btn-primary" onclick="navigate('volume')">Read Latest Volume ↓</button>
+      <button class="btn btn-primary" onclick="openLatestVolumePdf()">Read Latest Volume ↓</button>
       <a class="btn btn-outline" href="https://stevens.edu" target="_blank">Join SJOLT →</a>
     </div>
   </div>
@@ -750,7 +751,7 @@
       <h2>Explore Our Latest Volume</h2>
       <p>Read cutting-edge student scholarship on law, policy, and technology.</p>
     </div>
-    <button class="btn btn-primary" onclick="navigate('volume')">View Articles →</button>
+    <button class="btn btn-primary" onclick="openLatestVolumePdf()">View Articles →</button>
   </div>
 
 </div>
@@ -764,14 +765,32 @@
     <p class="hero-sub" id="volumeHeroSub"></p>
   </div>
 
+  <div class="section section-alt">
+    <div class="section-title">Full Volume</div>
+    <div class="section-title-rule"></div>
+    <p class="section-sub">Open the complete issue in a new tab and then browse the individual articles below.</p>
+    <div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:18px;">
+      <a class="btn btn-primary" id="latestFullVolumeLink" href="#" target="_blank" rel="noopener">Open Full Volume PDF →</a>
+    </div>
+  </div>
+
   <!-- Individual articles -->
   <div class="section">
     <div class="section-title">Articles</div>
     <div class="section-title-rule"></div>
     <div class="article-list" id="articleList"></div>
   </div>
+</div>
 
-  <!-- Archive -->
+<!-- ═══════════════════════════════ ARCHIVE ════════════════════════════════ -->
+<div class="page" id="page-archive">
+  <div class="hero" style="padding-bottom:48px;">
+    <div class="hero-eyebrow">Past Issues</div>
+    <h1>Journal <em>Archive</em></h1>
+    <div class="hero-rule"></div>
+    <p class="hero-sub">Browse earlier SJOLT volumes and open the full PDF for each edition.</p>
+  </div>
+
   <div class="section section-alt" id="archiveSection">
     <div class="section-title">Archive</div>
     <div class="section-title-rule"></div>
@@ -989,8 +1008,9 @@ const DATA = {
   ],
   "latestVolume": {
     "number": "Volume I",
-    "year": "2024–2025",
-    "description": "Our inaugural volume explores foundational questions at the intersection of law, policy, and emerging technology.",
+    "year": "2025",
+    "description": "Our new volume explores foundational questions at the intersection of law, policy, and emerging technology.",
+    "fullPdfUrl": "volumes/SJOLT_Volume_I.pdf",
     "articles": [
       {
         "title": "Digital Diagnostics and the Dilemma of Consent: Rethinking Patient Autonomy with AI-Powered Medicine",
@@ -1019,7 +1039,7 @@ const DATA = {
     {
       "number": "Volume I",
       "year": "2024-2025",
-      "fullPdfUrl": "volumes/volume_1.pdf"
+      "fullPdfUrl": "volumes/SJOLT_Volume_I.pdf"
     }
   ],
   "guidelines": [
@@ -1034,56 +1054,69 @@ const DATA = {
     "editorInChief": {
       "name": "Nicholas Russo",
       "year": "Class of '27",
+      "photoUrl": "",
       "bio": "Editor in Chief"
     },
     "editors": [
       {
         "name": "Alessia Giuffrida",
-        "year": "Class of '29"
+        "year": "Class of '29",
+        "photoUrl": ""
       },
       {
         "name": "Amani Karim",
-        "year": "Class of '28"
+        "year": "Class of '28",
+        "photoUrl": ""
       },
       {
         "name": "Ananya Iyer",
-        "year": "Class of '27"
+        "year": "Class of '27",
+        "photoUrl": ""
       },
       {
         "name": "Charlotte Hubert",
-        "year": "Class of '29"
+        "year": "Class of '29",
+        "photoUrl": ""
       },
       {
         "name": "Jebin Thing",
-        "year": "Class of '28"
+        "year": "Class of '28",
+        "photoUrl": ""
       },
       {
         "name": "Jong In Park",
-        "year": "Class of '29"
+        "year": "Class of '29",
+        "photoUrl": ""
       },
       {
         "name": "Vritika Mandapaka",
-        "year": "Class of '26"
+        "year": "Class of '26",
+        "photoUrl": ""
       },
       {
         "name": "Lieu Butler",
-        "year": "Class of '29"
+        "year": "Class of '29",
+        "photoUrl": ""
       },
       {
         "name": "Sahana Ali",
-        "year": "Class of '27"
+        "year": "Class of '27",
+        "photoUrl": ""
       },
       {
         "name": "Victoria Martinez",
-        "year": "Class of '29"
+        "year": "Class of '29",
+        "photoUrl": ""
       },
       {
         "name": "Kimberly Hernandez",
-        "year": "Class of '29"
+        "year": "Class of '29",
+        "photoUrl": ""
       },
       {
         "name": "Viyasha Thakar",
-        "year": ""
+        "year": "",
+        "photoUrl": ""
       }
     ]
   }
@@ -1129,10 +1162,25 @@ function renderInvolved() {
   `).join('');
 }
 
+function openLatestVolumePdf() {
+  const pdfUrl = DATA.latestVolume?.fullPdfUrl;
+  if (!pdfUrl) {
+    navigate('volume');
+    return;
+  }
+  window.open(pdfUrl, '_blank', 'noopener,noreferrer');
+}
+
 function renderVolume() {
   const v = DATA.latestVolume;
+  const fullPdfUrl = v.fullPdfUrl || '';
   document.getElementById('volumeHeroTitle').textContent = v.number + ' · ' + v.year;
   document.getElementById('volumeHeroSub').textContent = v.description;
+  const fullVolumeLink = document.getElementById('latestFullVolumeLink');
+  if (fullVolumeLink) {
+    fullVolumeLink.href = fullPdfUrl || '#';
+    fullVolumeLink.style.display = fullPdfUrl ? 'inline-flex' : 'none';
+  }
   document.getElementById('articleList').innerHTML = v.articles.map((a, i) => `
     <div class="article-item">
       <div>
@@ -1153,7 +1201,6 @@ function renderArchive() {
   const archive = DATA.archive;
   const section = document.getElementById('archiveSection');
 
-  // Hide the whole section if there are no past volumes yet
   if (!archive || archive.length === 0) {
     section.style.display = 'none';
     return;
@@ -1166,8 +1213,11 @@ function renderArchive() {
         <div class="volume-card-eyebrow">${v.year}</div>
         <div class="volume-card-title">${v.number}</div>
         <div class="volume-card-actions">
+          <a class="volume-card-dl" href="${v.fullPdfUrl}" target="_blank" rel="noopener">
+            Open Full Volume
+          </a>
           <a class="volume-card-dl" href="${v.fullPdfUrl}" download>
-            ⬇ Download Full Volume
+            ⬇ Download
           </a>
         </div>
       </div>
@@ -1189,11 +1239,22 @@ function renderGuidelines() {
 function renderMasthead() {
   const m = DATA.masthead;
   const eic = m.editorInChief;
+  const renderPersonAvatar = (person, compact = false) => {
+    const imgClass = compact ? 'masthead-avatar sm masthead-photo sm-photo' : 'masthead-avatar masthead-photo';
+    const initialFallback = `<div class="${compact ? 'masthead-avatar sm' : 'masthead-avatar'}" style="background:${colorForName(person.name)}">${initials(person.name)}</div>`;
+
+    if (!person || !person.name) return initialFallback;
+    if (person.photoUrl) {
+      return `<img class="${imgClass}" src="${person.photoUrl}" alt="${person.name}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" /><div class="${compact ? 'masthead-avatar sm' : 'masthead-avatar'}" style="background:${colorForName(person.name)}; display:none;">${initials(person.name)}</div>`;
+    }
+    return initialFallback;
+  };
+
   document.getElementById('mastheadContent').innerHTML = `
     <div class="masthead-section">
       <div class="masthead-role">Editor in Chief</div>
       <div class="masthead-eic">
-        <div class="masthead-avatar" style="background:${colorForName(eic.name)}">${initials(eic.name)}</div>
+        ${renderPersonAvatar(eic)}
         <div>
           <div class="masthead-name">${eic.name}</div>
           <div class="masthead-title-tag">${eic.year}</div>
@@ -1205,7 +1266,7 @@ function renderMasthead() {
       <div class="masthead-grid">
         ${m.editors.map(e => `
           <div class="masthead-member">
-            <div class="masthead-avatar sm" style="background:${colorForName(e.name)}">${initials(e.name)}</div>
+            ${renderPersonAvatar(e, true)}
             <div>
               <div class="masthead-name" style="font-size:1rem;">${e.name}</div>
               <div class="masthead-title-tag" style="font-size:0.8rem;">${e.year}</div>
@@ -1264,6 +1325,158 @@ renderVolume();
 renderArchive();
 renderGuidelines();
 renderMasthead();
+</script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
 </script>
 <!-- Code injected by live-server -->
 <script>

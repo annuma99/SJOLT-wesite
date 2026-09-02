@@ -444,11 +444,12 @@ const DEFAULTS = {
     number: "Volume I",
     year: "2024–2025",
     description: "Our inaugural volume explores foundational questions at the intersection of law, policy, and emerging technology.",
+    fullPdfUrl: "volumes/volume_1.pdf",
     articles: []
   },
   archive: [],
   masthead: {
-    editorInChief: { name: "", year: "" },
+    editorInChief: { name: "", year: "", photoUrl: "" },
     editors: []
   },
   guidelines: [
@@ -552,12 +553,21 @@ async function loadStateFromIndex() {
         number:      parsed.latestVolume?.number      ?? DEFAULTS.latestVolume.number,
         year:        parsed.latestVolume?.year        ?? DEFAULTS.latestVolume.year,
         description: parsed.latestVolume?.description ?? DEFAULTS.latestVolume.description,
+        fullPdfUrl:  parsed.latestVolume?.fullPdfUrl  ?? DEFAULTS.latestVolume.fullPdfUrl,
         articles:    parsed.latestVolume?.articles    ?? []
       },
       archive:   parsed.archive   ?? [],
       masthead: {
-        editorInChief: parsed.masthead?.editorInChief ?? { name: '', year: '' },
-        editors:       parsed.masthead?.editors       ?? []
+        editorInChief: {
+          name:     parsed.masthead?.editorInChief?.name     ?? '',
+          year:     parsed.masthead?.editorInChief?.year     ?? '',
+          photoUrl: parsed.masthead?.editorInChief?.photoUrl ?? ''
+        },
+        editors: (parsed.masthead?.editors ?? []).map(e => ({
+          name:     e.name ?? '',
+          year:     e.year ?? '',
+          photoUrl: e.photoUrl ?? ''
+        }))
       },
       guidelines: parsed.guidelines ?? DEFAULTS.guidelines,
       settings: {
@@ -641,6 +651,11 @@ function renderArticles() {
     <div class="field">
       <label>Volume Description (shows under the header)</label>
       <textarea id="vol-desc" rows="2">${esc(v.description)}</textarea>
+    </div>
+    <div class="field">
+      <label>Full Volume PDF Path</label>
+      <input id="vol-pdf" value="${esc(v.fullPdfUrl || '')}" placeholder="volumes/volume_1.pdf" />
+      <div class="field-hint">Used for the “Open Full Volume” link on the latest issue screen.</div>
     </div>
 
     <div class="section-label" style="margin-top:32px;">
@@ -835,6 +850,12 @@ function renderMasthead() {
           placeholder="Class of '25"
           onchange="S.masthead.editorInChief.year=this.value" />
       </div>
+      <div>
+        <label>Photo URL</label>
+        <input id="eic-photo" value="${esc(m.editorInChief.photoUrl || '')}"
+          placeholder="images/editor-name.jpg"
+          onchange="S.masthead.editorInChief.photoUrl=this.value" />
+      </div>
     </div>
 
     <div class="section-label" style="margin-top:28px;">
@@ -862,13 +883,15 @@ function personRow(i, e) {
         onchange="S.masthead.editors[${i}].name=this.value" />
       <input class="year-field" value="${esc(e.year)}" placeholder="Class of '26"
         onchange="S.masthead.editors[${i}].year=this.value" />
+      <input class="photo-field" value="${esc(e.photoUrl || '')}" placeholder="images/editor-name.jpg"
+        onchange="S.masthead.editors[${i}].photoUrl=this.value" />
       <button class="btn-remove" onclick="removeEditor(${i})">✕</button>
     </div>
   `;
 }
 
 function addEditor() {
-  S.masthead.editors.push({ name: '', year: '' });
+  S.masthead.editors.push({ name: '', year: '', photoUrl: '' });
   renderMasthead();
 }
 
@@ -1049,9 +1072,11 @@ function collectAllFields() {
   const vn = document.getElementById('vol-number');
   const vy = document.getElementById('vol-year');
   const vd = document.getElementById('vol-desc');
+  const vp = document.getElementById('vol-pdf');
   if (vn) S.latestVolume.number      = vn.value;
   if (vy) S.latestVolume.year        = vy.value;
   if (vd) S.latestVolume.description = vd.value;
+  if (vp) S.latestVolume.fullPdfUrl  = vp.value;
 
   // Collect settings fields
   const ru = document.getElementById('set-regUrl');
@@ -1159,17 +1184,23 @@ function buildDataObject() {
       number:      S.latestVolume.number,
       year:        S.latestVolume.year,
       description: S.latestVolume.description,
+      fullPdfUrl:  S.latestVolume.fullPdfUrl || '',
       articles:    S.latestVolume.articles
     },
     archive: S.archive || [],
     guidelines: S.guidelines,
     masthead: {
       editorInChief: {
-        name: S.masthead.editorInChief.name,
-        year: S.masthead.editorInChief.year,
-        bio:  "Editor in Chief"
+        name:     S.masthead.editorInChief.name,
+        year:     S.masthead.editorInChief.year,
+        photoUrl: S.masthead.editorInChief.photoUrl || '',
+        bio:      "Editor in Chief"
       },
-      editors: S.masthead.editors
+      editors: (S.masthead.editors || []).map(e => ({
+        name:     e.name || '',
+        year:     e.year || '',
+        photoUrl: e.photoUrl || ''
+      }))
     }
   };
 }
