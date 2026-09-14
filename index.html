@@ -727,10 +727,6 @@
     <p class="hero-sub">
       A student-run publication at Stevens Institute of Technology dedicated to the intersection of emerging technology and the law.
     </p>
-    <div class="hero-buttons">
-      <button class="btn btn-primary" onclick="openLatestVolumePdf()">Read Latest Volume ↓</button>
-      <a class="btn btn-outline" href="https://stevens.edu" target="_blank">Join SJOLT →</a>
-    </div>
   </div>
 
   <!-- Mission -->
@@ -1227,14 +1223,10 @@ function renderVolume() {
     <div class="article-item">
       <div>
         <div class="article-meta">Article ${String(i+1).padStart(2,'0')} · ${v.number}</div>
-        <div class="article-title">${a.title}</div>
+        <a class="article-title" href="${a.pdfUrl}" target="_blank" rel="noopener">${a.title}</a>
         <div class="article-author">${a.author} — ${a.affiliation}</div>
         <div class="article-abstract">${a.abstract}</div>
       </div>
-      <a class="article-download" href="${a.pdfUrl}" download title="Download PDF">
-        <span class="article-download-icon">⬇</span>
-        PDF
-      </a>
     </div>
   `).join('');
 }
